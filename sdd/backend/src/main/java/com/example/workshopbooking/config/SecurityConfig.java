@@ -1,15 +1,32 @@
 package com.example.workshopbooking.config;
 
+import com.example.workshopbooking.common.ApiErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -23,6 +40,26 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
+    }
+
+    @Bean
+    AuthenticationManager accountAuthenticationManager(AuthenticationProvider accountAuthenticationProvider) {
+        return new ProviderManager(accountAuthenticationProvider);
+    }
+
+    @Bean
+    SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new ChangeSessionIdAuthenticationStrategy();
+    }
+
+    @Bean
+    SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
+    CsrfAuthenticationStrategy csrfAuthenticationStrategy(CsrfTokenRepository csrfTokenRepository) {
+        return new CsrfAuthenticationStrategy(csrfTokenRepository);
     }
 
     @Bean
@@ -42,7 +79,10 @@ public class SecurityConfig {
             HttpSecurity http,
             CookieCsrfTokenRepository csrfTokenRepository,
             SpaCsrfTokenRequestHandler csrfTokenRequestHandler,
-            AuthenticationProvider accountAuthenticationProvider)
+            AuthenticationProvider accountAuthenticationProvider,
+            AuthenticationManager accountAuthenticationManager,
+            SecurityContextRepository securityContextRepository,
+            ObjectMapper objectMapper)
             throws Exception {
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
@@ -60,7 +100,50 @@ public class SecurityConfig {
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.authenticationProvider(accountAuthenticationProvider);
+        http.authenticationManager(accountAuthenticationManager);
+        http.securityContext(security -> security
+                .securityContextRepository(securityContextRepository)
+                .requireExplicitSave(true));
+        http.sessionManagement(session -> session
+                .sessionFixation(sessionFixation -> sessionFixation.changeSessionId()));
+        http.logout(logout -> logout
+                .logoutUrl("/api/v1/auth/logout")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+                .logoutSuccessHandler(csrfRefreshingLogoutSuccessHandler(csrfTokenRepository)));
+        http.exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(jsonAuthenticationEntryPoint(objectMapper))
+                .accessDeniedHandler(jsonAccessDeniedHandler(objectMapper)));
 
         return http.build();
+    }
+
+    private static LogoutSuccessHandler csrfRefreshingLogoutSuccessHandler(CsrfTokenRepository csrfTokenRepository) {
+        return (request, response, authentication) -> {
+            CsrfToken freshToken = csrfTokenRepository.generateToken(request);
+            csrfTokenRepository.saveToken(freshToken, request, response);
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        };
+    }
+
+    private static AuthenticationEntryPoint jsonAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        return (request, response, exception) -> writeError(
+                objectMapper, response, HttpServletResponse.SC_UNAUTHORIZED,
+                "UNAUTHENTICATED", "Authentication is required.", request.getRequestURI());
+    }
+
+    private static AccessDeniedHandler jsonAccessDeniedHandler(ObjectMapper objectMapper) {
+        return (request, response, exception) -> writeError(
+                objectMapper, response, HttpServletResponse.SC_FORBIDDEN,
+                "CSRF_REJECTED", "The request could not be verified.", request.getRequestURI());
+    }
+
+    private static void writeError(
+            ObjectMapper objectMapper, HttpServletResponse response, int status,
+            String code, String message, String path) throws IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        objectMapper.writeValue(response.getOutputStream(), ApiErrorResponse.of(status, code, message, path));
     }
 }
