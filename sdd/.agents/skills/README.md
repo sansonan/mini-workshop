@@ -1,5 +1,11 @@
 # Reusable Agent Skills
 
-Store reusable, task-specific workflows for AI agents in this directory. A skill should explain when it applies, what project material to read, the steps to follow, expected outputs, and how to verify the result.
+Codex discovers project Skills from folders under `.agents/skills/` when `sdd/` is open as the workspace. Each Skill is defined by a `SKILL.md` file with YAML frontmatter containing its name and description.
 
-Keep skills narrow, repeatable, and consistent with `AGENTS.md` and approved specifications. Avoid copying the same project-wide instructions into every skill. Add a skill only when a workflow is sufficiently stable and useful to reuse; this directory is intentionally empty apart from this guide.
+## Available Skills
+
+- `sdd-document-reviewer/` — review approved requirements, architecture, database design, API contracts, security, and acceptance-criteria traceability. Read-only unless the owner explicitly authorizes specification changes.
+- `springboot-backend-developer/` — implement specifically assigned and approved backend work using Java 21, Spring Boot, Maven, PostgreSQL, and the approved security and testing conventions.
+- `code-reviewer-tester/` — perform read-only code, security, contract, and test reviews; report findings by severity and never claim unexecuted tests passed.
+
+Keep Skills focused on reusable task workflows. Follow `../AGENTS.md` and the approved specifications; do not duplicate or override project-wide rules.

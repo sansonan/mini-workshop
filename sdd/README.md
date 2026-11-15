@@ -1,6 +1,6 @@
 # Spec-Driven Development Project
 
-This directory is the documentation and workspace foundation for a Spec-Driven Development (SDD) project. It establishes where specifications, agent guidance, application code, database assets, and quality records belong. No application functionality is implemented yet.
+This directory is the main workspace for the Mini Workshop Booking System. It contains the approved SDD documents, project-wide AI instructions, reusable Skills, and dedicated locations for backend, frontend, database, and QA work. The application foundation is documented; application functionality is not implemented yet.
 
 ## Objectives
 
@@ -11,12 +11,13 @@ This directory is the documentation and workspace foundation for a Spec-Driven D
 
 ## Technology stack
 
-- Backend: Java 21 and Spring Boot
+- Backend: Java 21, Spring Boot, and Maven
 - Frontend: React
-- Database: PostgreSQL
-- Development approach: Spec-Driven Development
+- Database: PostgreSQL (`workshop_booking_db`)
+- API: JSON REST under `/api/v1`
+- Development approach: Spec-Driven Development (SDD)
 
-Choose and document exact framework, build-tool, package-manager, and runtime versions in the relevant specifications when the project is initialized.
+Use the versions and conventions established by the backend and frontend projects when they are initialized. Keep credentials and environment-specific configuration out of source control.
 
 ## Project structure
 
@@ -33,7 +34,7 @@ sdd/
 └── README.md         Project overview and getting-started guide
 ```
 
-Each area has a README describing its intended contents. Add implementation files only after the applicable specifications and plans are reviewed.
+The `agents/`, `backend/`, `frontend/`, `database/`, and `qa/` directories contain README files describing their intended contents. The approved specifications live in `docs/`, and `.agents/skills/README.md` lists the reusable Skills. Open `sdd/` as the Codex workspace so Codex discovers `AGENTS.md` and Skills under `.agents/skills/`. Add implementation files only after the applicable specifications and plans are reviewed.
 
 ## Development environment prerequisites
 
@@ -41,16 +42,16 @@ Install the following before implementation begins:
 
 - Git
 - JDK 21
-- Node.js and a compatible package manager, as selected for the frontend
-- PostgreSQL, either locally or through an approved development container/service
-- The backend and frontend build tools selected by the project
+- Maven (or the project Maven Wrapper once added)
+- Node.js and the package manager selected by the React project
+- PostgreSQL, locally or through an approved development service
 
-Record exact versions and any additional tools in `docs/` once they are chosen.
+Record exact versions and additional tools in the relevant project documentation once chosen.
 
 ## Setup
 
-1. Clone or open the project repository.
-2. Read `AGENTS.md` and the relevant requirements and architecture documents under `docs/`.
+1. Clone or open the repository, then open `sdd/` as the project workspace.
+2. Read `AGENTS.md` and the relevant approved documents under `docs/`.
 3. Configure local environment values using the project's documented template. Do not commit secrets.
 4. Install backend and frontend dependencies after their respective application manifests have been created.
 5. Create or connect to a PostgreSQL development database using the documented database setup and migrations.
@@ -59,10 +60,10 @@ This foundation does not include application manifests, source code, database mi
 
 ## Run the backend
 
-From `backend/`, use the command for the build tool selected by the project:
+From `backend/`, run the Spring Boot application with Maven after its project files and configuration have been created:
 
-- Maven wrapper: `./mvnw spring-boot:run` (Windows: `mvnw.cmd spring-boot:run`)
-- Gradle wrapper: `./gradlew bootRun` (Windows: `gradlew.bat bootRun`)
+- Maven: `mvn spring-boot:run`
+- Maven Wrapper, if present: `./mvnw spring-boot:run` (Windows: `mvnw.cmd spring-boot:run`)
 
 The backend README and run configuration should document the chosen command, required environment variables, and expected local address once the application exists.
 
@@ -74,7 +75,7 @@ Document the actual commands and local address in the frontend README when the a
 
 ## Database configuration
 
-Use PostgreSQL for local development and keep connection details outside source control. The backend configuration should document the selected environment variable names, such as a JDBC URL, username, and password, without storing real credentials in the repository. Keep schema changes in reviewed, versioned migrations under `database/`; see that directory's README for guidance.
+Use PostgreSQL database `workshop_booking_db` for local development and keep connection details outside source control. The backend configuration should document environment variable names, such as a JDBC URL, username, and password, without storing real credentials in the repository. Keep schema changes in reviewed, versioned migrations under `database/`; see that directory's README for guidance.
 
 ## SDD development workflow
 

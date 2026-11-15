@@ -1,77 +1,105 @@
-# Project Instructions for AI Agents
+# Project Instructions for Codex and AI Agents
 
-These instructions apply to work inside `sdd/`. They are intended for Codex and other AI agents collaborating on this project.
+These instructions apply when `sdd/` is opened as the project workspace. Read them before working here. More specific instructions may add guidance but may not override approved specifications.
 
-## Project overview
+## Project overview and technology stack
 
-This is the foundation for a Spec-Driven Development project. The planned application uses a Java 21 and Spring Boot backend, a React frontend, and PostgreSQL. This directory currently establishes organization and guidance only; do not treat the planned stack as permission to invent product behavior or start implementation without an approved specification.
+The Mini Workshop Booking System lets visitors browse and register for workshops, Admins manage workshops, and Instructors view their assigned workshops and participants. This is a beginner-oriented Spec-Driven Development (SDD) project.
 
-## Read specifications before implementation
+- Backend: Java 21, Spring Boot, Maven
+- Frontend: React
+- Database: PostgreSQL (`workshop_booking_db`)
+- API: JSON REST, versioned under `/api/v1`
+- Authentication: Spring Security server-side sessions and secure cookies
+- Email: SMTP delivery through the PostgreSQL outbox
+- Backend tests: JUnit 5 and Mockito, with PostgreSQL-backed integration tests
 
-Before changing code, data models, APIs, or behavior:
+The approved architecture is a single modular monolith. Do not introduce microservices, message brokers, or unrelated infrastructure.
 
-1. Read this file and the README for the area you will change.
-2. Find and read the relevant requirements, acceptance criteria, architecture, API, data model, and decision records in `docs/` and `database/`.
-3. Check for an implementation plan or QA plan related to the requested work.
-4. If an essential requirement is missing or conflicting, make progress on independent documentation or investigation and ask for clarification before making assumptions that affect product behavior or architecture.
-5. Keep changes traceable to the specifications; update the related documentation when an approved decision changes.
+## Approved sources of truth
 
-## SDD development principles
+Treat these approved documents as the requirements and design baseline:
 
-- Treat reviewed specifications and acceptance criteria as the source of truth.
-- Define observable outcomes and edge cases before implementing them.
-- Keep requirements, design decisions, implementation, and verification linked.
-- Prefer small, reviewable changes that satisfy a stated requirement.
-- Record meaningful decisions and their rationale in `docs/`.
-- Do not add application functionality as part of this foundation task.
+1. `docs/requirements.md` (M1)
+2. `docs/architecture.md` (M2.1)
+3. `docs/database-design.md` (M2.2)
+4. `docs/api-specification.md` (M2.3)
 
-## Technology and coding standards
+Read the relevant SDD documents, area README, implementation plan, and QA plan before implementation. Follow the API and database contracts. Never silently modify an approved specification; propose a specific change and obtain explicit owner approval first.
 
-- Backend code belongs in `backend/` and targets Java 21 with Spring Boot.
-- Frontend code belongs in `frontend/` and uses React.
-- Database scripts, schema assets, migrations, and SQL guidance belong in `database/`.
-- Follow the existing build tools, dependency versions, formatting, and naming conventions once established. Do not introduce a second tool or convention without documenting the reason.
-- Prefer clear names, focused modules, explicit validation, and useful error handling.
-- Keep configuration external where appropriate. Never commit credentials, tokens, private keys, or production data.
-- Keep API contracts explicit and consistent across frontend, backend, and specifications.
-- Make user-facing interfaces accessible and handle loading, empty, error, and success states where relevant.
+## SDD-first workflow and scope
 
-## Architecture guidelines
+1. Inspect the workspace, current Git changes, applicable `AGENTS.md` files, Skills, and existing tests.
+2. Read the relevant specifications and trace the task to requirements and acceptance criteria.
+3. Identify dependencies, affected modules, risks, and verification steps. Explain the plan before substantial work.
+4. If an essential product, security, API, or data decision is unclear, ask the project owner. Continue independent work where possible.
+5. Implement only the assigned, approved behavior in a focused change.
+6. Run relevant checks after implementation. Report exact commands, outcomes, changed files, and unresolved questions. Never claim an unrun check passed.
 
-- Use the architecture documented in `docs/`; do not create competing patterns without recording and reviewing the decision.
-- Keep presentation, application/business logic, persistence, and integration responsibilities clearly separated.
-- Validate inputs at system boundaries and enforce important invariants in the appropriate domain or service layer.
-- Avoid unnecessary dependencies, hidden cross-layer coupling, and duplicated sources of truth.
-- Document API changes, compatibility effects, and significant data-flow changes.
+Do not invent requirements, business rules, endpoints, fields, response behavior, schema, or deployment assumptions. Do not implement unapproved features or edit approved specifications as a side effect of code changes.
 
-## Testing and quality requirements
+## Java and Spring Boot standards
 
-- For each behavior change, add or update tests at the appropriate level and map coverage to acceptance criteria.
-- Run the relevant project checks after implementation and report exactly what was run and its result. Do not claim checks passed if they were not run.
-- Keep test plans, cases, reports, and manual QA notes in `qa/` when they are project artifacts.
-- Tests must be repeatable and must not rely on production systems or real user data.
-- Include validation, failure paths, and boundary cases, not only the happy path.
+- Keep HTTP handling in controllers, use cases and business rules in services, and persistence in repositories.
+- Use request and response DTOs; do not expose JPA entities directly.
+- Prefer constructor injection, focused classes, clear names, and explicit error handling.
+- Validate at API boundaries and enforce important invariants in service and database layers.
+- Use transactions for registration plus outbox creation, capacity changes, and other multi-step state changes that must succeed together.
+- Follow established Maven and Spring conventions. Add dependencies only for an approved task and reason.
 
-## Database guidelines
+## React standards
 
-- Use PostgreSQL and keep database work under `database/` unless the established build structure requires otherwise.
-- Make schema changes through reviewed, ordered, versioned migrations; do not rely on undocumented manual edits.
-- Consider constraints, indexes, nullability, data integrity, and migration/rollback impact.
-- Never put secrets or real personal data in scripts, fixtures, or documentation.
-- Update the data model and relevant API or architecture specifications when persisted data changes.
+- Follow the existing React structure and tooling. Do not add a state-management or UI library without approval.
+- Keep API access and feature UI responsibilities clear; follow the approved API contract and handle loading, empty, success, and error states.
+- Use accessible labels, keyboard behavior, and semantic elements.
+- Treat frontend validation as usability support; the backend remains authoritative.
+- Never put session identifiers, credentials, or secrets in browser local storage or source code.
 
-## Git and commit conventions
+## Architecture and REST API rules
 
-- Keep changes focused and avoid unrelated formatting or generated files.
-- Use imperative, descriptive commit subjects. Prefer Conventional Commit prefixes such as `docs:`, `feat:`, `fix:`, `test:`, and `refactor:` when the repository adopts that convention.
-- Do not commit local environment files, credentials, build outputs, dependency caches, or test artifacts unless explicitly required and documented.
-- Preserve existing user changes. Review the working tree before editing or staging files.
+- Keep the approved single modular monolith and separation between presentation, application/business logic, persistence, and integrations.
+- Implement only routes and behavior in `docs/api-specification.md` under `/api/v1`.
+- Follow its JSON DTO fields, validation limits, HTTP status codes, and standard error contract. Do not add pagination, routes, filters, or response fields outside the approved API.
+- Use explicit-offset API timestamps and the approved `Asia/Phnom_Penh` time-zone semantics.
+- Keep participant data out of responses unless the caller is an authorized Admin or the Instructor assigned to that workshop.
 
-## Rules for AI agents
+## PostgreSQL and data integrity
 
-- Inspect the relevant project structure and existing files before editing.
-- Create only what the task requires; do not overwrite existing material without a clear need.
-- Do not invent requirements, endpoint behavior, schema details, or deployment assumptions. Mark unresolved choices as open questions.
-- Do not implement unrelated functionality or add dependencies without a specification or explicit request.
-- Keep documentation beginner-friendly, accurate, and synchronized with the project.
-- Summarize files changed, checks performed, and any unresolved questions in the final response.
+- Use only the four approved tables: `accounts`, `workshops`, `registrations`, and `email_outbox`.
+- Follow `docs/database-design.md` for identity primary keys, columns, field limits, foreign keys, checks, unique constraints, indexes, and deletion behavior.
+- Store workshop times as unambiguous instants; interpret and display them using `Asia/Phnom_Penh`.
+- Derive workshop status; do not persist a separate status column. Reject registration at or after workshop start.
+- Prevent duplicate registration with the approved unique constraint and prevent overbooking with the approved transaction and workshop-row lock strategy.
+- Prevent workshop deletion while registrations exist and prevent capacity reductions below the registration count.
+- Insert the registration and pending outbox message in one transaction. Follow the approved retry defaults and retention behavior.
+- Put database scripts and reviewed migrations under `database/` unless an established build convention requires otherwise. Never create unapproved schema objects, triggers, or migrations, or execute SQL against a production database.
+
+## Security requirements
+
+- Use Spring Security server-side sessions, secure cookies, HTTPS, CSRF protection for state-changing requests, and exact-origin CORS if frontend and API use separate origins.
+- Enforce Admin and Instructor roles on the server; UI route guards are not authorization.
+- Derive the current Instructor from the authenticated session and verify workshop ownership for every protected Instructor workshop and participant request.
+- Store password hashes only. Keep database and SMTP credentials in external configuration.
+- Do not expose participant data, password hashes, secrets, stack traces, SQL details, or sensitive outbox errors to unauthorized callers.
+- The CSRF token transport/header, session timeout, and final `SameSite` value remain open configuration decisions in the approved documents. Do not silently choose them or add an unapproved CSRF endpoint.
+
+## Testing and quality
+
+- Add or update JUnit 5 and Mockito unit tests for changed backend behavior.
+- Add integration tests when persistence, database constraints, authentication, authorization, or transactions are involved. Use PostgreSQL-backed tests for PostgreSQL-specific behavior.
+- Cover success, validation, authorization, conflict, boundary, concurrency, and failure cases linked to acceptance criteria.
+- Use the established frontend test tooling for React changes and verify accessible, user-visible states.
+- Keep repeatable QA plans, cases, reports, and manual test notes in `qa/`. Do not rely on production services or real user data.
+
+## Git and change management
+
+- Inspect `git status` before editing and preserve unrelated user changes.
+- Keep diffs focused. Do not stage, commit, push, reset, or rewrite history unless the owner explicitly asks.
+- Never commit credentials, local environment files, build outputs, caches, or real participant data.
+- When asked to commit, use a clear imperative Conventional Commit subject such as `docs: ...`, `feat: ...`, `fix: ...`, or `test: ...`.
+
+## Owner decisions and agent conduct
+
+- Ask the owner when an unsettled decision affects product behavior, authorization, API contracts, persisted data, security policy, or scope. Explain the impact and offer a small set of options.
+- Inspect relevant files before editing and create only what the task requires. Preserve existing work and do not overwrite user material unnecessarily.
+- Keep implementation traceable to approved specifications and acceptance criteria. Report changed files, tests/checks run, and unresolved items.

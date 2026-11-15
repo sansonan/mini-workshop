@@ -114,21 +114,23 @@ Keep screens and behavior grouped by feature. Begin with React's built-in state 
 | Entity | Important fields | Relationships and rules |
 |---|---|---|
 | `Account` | Email, password hash, display name, role (`ADMIN` or `INSTRUCTOR`), active flag | One instructor account may be assigned to many workshops. No visitor accounts. |
-| `Workshop` | Title, description, start/end time, location, maximum participants, instructor account | Belongs to one instructor and has many registrations. |
+| `Workshop` | Title, description, start/end instants, location, maximum participants, instructor account | Belongs to one instructor and has many registrations. |
 | `Registration` | Workshop, participant name, normalized email, optional phone, registration time | Belongs to one workshop. Unique `(workshop_id, normalized_email)`. Visitor identity is stored with the registration. |
 | `EmailOutbox` | Registration reference, message data, delivery status, attempt count, timestamps, last error | One confirmation record per registration; tracks pending delivery and retries. |
 
 Store the maximum participant count and calculate remaining seats as `maximum participants - registration count`; do not maintain a second mutable seat counter. Use a restrictive foreign key from registrations to workshops so a workshop with registrations cannot be deleted.
 
+Store workshop start and end times as unambiguous instants. Use the configured training-center time zone, `Asia/Phnom_Penh` (UTC+7), for backend status and registration calculations and display workshop times in that time zone.
+
 ### Workshop status rule
 
-Status is calculated by the system and is not an Admin-editable field:
+Status is calculated by the system using the configured `Asia/Phnom_Penh` time zone and is not an Admin-editable field:
 
-1. `COMPLETED` when the workshop start time has passed.
-2. Otherwise `FULL` when registration count reaches maximum capacity.
+1. `COMPLETED` when current time reaches or passes the workshop end time.
+2. `FULL` when the workshop has not ended and registration count reaches maximum capacity.
 3. Otherwise `OPEN`.
 
-This gives time-based completion precedence over capacity status and avoids status drift. Only `OPEN` workshops that have not started and have available capacity accept registrations.
+This gives completion precedence over capacity status and avoids status drift. Registration is rejected once current time reaches the workshop start time, independently of displayed status. As a result, an `OPEN` workshop may have started but not yet ended; its displayed status remains `OPEN`, while registration is rejected.
 
 ## 6. REST API
 
@@ -152,7 +154,7 @@ All endpoints use JSON and the `/api/v1` prefix. Public workshop responses must 
 
 Use consistent errors: `400` for invalid input, `401` for unauthenticated requests, `403` for insufficient permission, `404` for missing resources, and `409` for duplicate registration, full or started workshops, or deletion blocked by registrations.
 
-For a booking, perform availability checks and save the registration in one transaction while locking the workshop row. This prevents concurrent bookings from exceeding capacity. The database unique constraint prevents duplicate registrations even if duplicate requests race.
+For a booking, use the configured `Asia/Phnom_Penh` time zone to determine whether the workshop start time has been reached. Reject registration at or after the start instant, independently of displayed status. Perform availability checks and save the registration in one transaction while locking the workshop row. This prevents concurrent bookings from exceeding capacity. The database unique constraint prevents duplicate registrations even if duplicate requests race.
 
 ## 7. Authentication and authorization
 
@@ -176,7 +178,7 @@ Use a PostgreSQL outbox so email delivery can be retried without adding a broker
 4. A scheduled worker in the Spring Boot application sends pending messages through SMTP.
 5. Mark successful messages as sent; retry temporary failures and record the final error after retries are exhausted.
 
-The confirmation contains participant name, workshop title, date/time, location, and a confirmation message. A delivery retry may occasionally duplicate an email if SMTP accepted the first send but its acknowledgement was lost; registration remains valid.
+The confirmation contains participant name, workshop title, date/time displayed in `Asia/Phnom_Penh`, location, and a confirmation message. A delivery retry may occasionally duplicate an email if SMTP accepted the first send but its acknowledgement was lost; registration remains valid.
 
 ## 9. Testing strategy
 
@@ -197,21 +199,22 @@ Use JUnit 5 and Mockito for backend unit tests. Map coverage to functional requi
 | Workshop status drifts from time or registrations | Calculate status using the approved rule above. |
 | SMTP is unavailable or acknowledgement is lost | Use the outbox and retry; account for occasional duplicate delivery. |
 | Workshop edits invalidate existing bookings | Reject capacity reductions below current registrations; changes to date/time or instructor do not alter stored registrations. |
-| Browser and server interpret workshop time differently | Store time consistently and display it in the training center's configured time zone. |
+| Browser and server interpret workshop time differently | Store unambiguous instants; use `Asia/Phnom_Penh` (UTC+7) for backend calculations and display. |
 | Staff provisioning and participant data handling are undefined | Provision staff accounts through an authorized operator and restrict participant data to Admins and assigned Instructors. |
 
 ## 11. Approved assumptions and decisions
 
 The following defaults are approved for Version 1:
 
-- Workshop status is system-derived: `COMPLETED` after start time, otherwise `FULL` at capacity, otherwise `OPEN`; Admins do not set it directly.
+- Workshop status is system-derived: `COMPLETED` when current time reaches/passes the end instant; otherwise `FULL` if capacity is reached; otherwise `OPEN`. Admins do not set it directly.
 - Staff accounts are provisioned by an administrator or operator. Public staff registration is not provided.
-- Workshop times are stored as instants and displayed in the configured training-center time zone.
+- Workshop times are stored as unambiguous instants and displayed using the `Asia/Phnom_Penh` (UTC+7) training-center time zone. Backend status and registration calculations use that configured time zone.
+- Registration is rejected when current time reaches or passes the workshop start instant, independently of displayed status.
 - An Admin cannot reduce capacity below the current registration count.
 - Visitor cancellation and staff registration editing are not included in Version 1.
 - A saved booking remains successful when email delivery is delayed; the outbox retries delivery.
 - Email addresses are trimmed and case-normalized for duplicate checks.
-- Public visitors can see Open, Full, and Completed workshops; only eligible Open workshops accept registration.
+- Public visitors can see Open, Full, and Completed workshops. Registration is accepted only before the start instant, while capacity remains, and while the workshop has not ended; displayed status alone does not determine eligibility.
 - Backend tests include PostgreSQL-backed integration testing using a container-based environment.
 
 These decisions refine the approved PRD without adding new user-facing features. Any later change to these decisions should be reviewed against the PRD and recorded in project documentation.
