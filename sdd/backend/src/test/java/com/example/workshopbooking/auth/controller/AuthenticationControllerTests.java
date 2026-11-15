@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +37,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -226,6 +229,108 @@ class AuthenticationControllerTests {
         assertTrue(this.sessionCookieHttpOnly);
         assertEquals("lax", this.sessionCookieSameSite);
         assertFalse(this.sessionCookieSecure);
+    }
+
+    @Test
+    void visitorCanReachOnlyPublicWorkshopAndRegistrationRoutes() throws Exception {
+        this.mockMvc.perform(get("/api/v1/workshops"))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/v1/workshops/42"))
+                .andExpect(status().isNotFound());
+
+        this.mockMvc.perform(post("/api/v1/workshops/42/registrations")
+                        .contentType("application/json")
+                        .content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("CSRF_REJECTED"));
+
+        Cookie csrf = obtainCsrfCookie();
+        this.mockMvc.perform(post("/api/v1/workshops/42/registrations")
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue())
+                        .contentType("application/json")
+                        .content("{}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void adminRouteFamilyRequiresAdminRole() throws Exception {
+        var instructor = SecurityMockMvcRequestPostProcessors.user("instructor").roles("INSTRUCTOR");
+        var admin = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
+        Cookie csrf = obtainCsrfCookie();
+
+        this.mockMvc.perform(get("/api/v1/admin/workshops").with(instructor))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        this.mockMvc.perform(get("/api/v1/admin/workshops").with(admin))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(post("/api/v1/admin/workshops").with(instructor)
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue())
+                        .contentType("application/json").content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        this.mockMvc.perform(post("/api/v1/admin/workshops").with(admin)
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue())
+                        .contentType("application/json").content("{}"))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(put("/api/v1/admin/workshops/42").with(instructor)
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue())
+                        .contentType("application/json").content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        this.mockMvc.perform(put("/api/v1/admin/workshops/42").with(admin)
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue())
+                        .contentType("application/json").content("{}"))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(delete("/api/v1/admin/workshops/42").with(instructor)
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        this.mockMvc.perform(delete("/api/v1/admin/workshops/42").with(admin)
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue()))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/v1/admin/workshops/42/registrations").with(instructor))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        this.mockMvc.perform(get("/api/v1/admin/workshops/42/registrations").with(admin))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void instructorRouteFamilyRequiresInstructorRoleWithoutOwnershipChecks() throws Exception {
+        var admin = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
+        var instructor = SecurityMockMvcRequestPostProcessors.user("instructor").roles("INSTRUCTOR");
+
+        this.mockMvc.perform(get("/api/v1/instructor/workshops").with(admin))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        this.mockMvc.perform(get("/api/v1/instructor/workshops").with(instructor))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/v1/instructor/workshops/42/registrations").with(instructor))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/v1/instructor/workshops/42/registrations").with(admin))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    void protectedAndUnmatchedRoutesReturnUnauthenticatedJson() throws Exception {
+        Cookie csrf = obtainCsrfCookie();
+        this.mockMvc.perform(get("/api/v1/admin/workshops"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
+        this.mockMvc.perform(get("/api/v1/instructor/workshops"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
+        this.mockMvc.perform(post("/api/v1/auth/logout")
+                        .cookie(csrf).header(CSRF_HEADER, csrf.getValue()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
+        this.mockMvc.perform(get("/api/v1/not-declared"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
+        this.mockMvc.perform(get("/api/v1/not-declared")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN")))
+                .andExpect(status().isNotFound());
     }
 
     private Cookie obtainCsrfCookie() throws Exception {

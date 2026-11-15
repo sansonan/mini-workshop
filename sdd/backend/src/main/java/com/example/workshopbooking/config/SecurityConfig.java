@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -15,20 +16,24 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfException;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -89,10 +94,18 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(csrfTokenRequestHandler));
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.GET, "/api/v1/workshops", "/api/v1/workshops/**")
+                .requestMatchers(HttpMethod.GET, "/api/v1/workshops", "/api/v1/workshops/*")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/workshops/*/registrations")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login")
                 .permitAll()
+                .requestMatchers("/api/v1/auth/me", "/api/v1/auth/logout")
+                .authenticated()
+                .requestMatchers("/api/v1/admin/**")
+                .hasRole("ADMIN")
+                .requestMatchers("/api/v1/instructor/**")
+                .hasRole("INSTRUCTOR")
                 .anyRequest()
                 .authenticated());
 
@@ -107,7 +120,7 @@ public class SecurityConfig {
         http.sessionManagement(session -> session
                 .sessionFixation(sessionFixation -> sessionFixation.changeSessionId()));
         http.logout(logout -> logout
-                .logoutUrl("/api/v1/auth/logout")
+                .logoutRequestMatcher(authenticatedLogoutRequestMatcher())
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
@@ -127,6 +140,19 @@ public class SecurityConfig {
         };
     }
 
+    private static RequestMatcher authenticatedLogoutRequestMatcher() {
+        return request -> {
+            String logoutPath = request.getContextPath() + "/api/v1/auth/logout";
+            if (!HttpMethod.POST.matches(request.getMethod()) || !logoutPath.equals(request.getRequestURI())) {
+                return false;
+            }
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            return authentication != null
+                    && authentication.isAuthenticated()
+                    && !(authentication instanceof AnonymousAuthenticationToken);
+        };
+    }
+
     private static AuthenticationEntryPoint jsonAuthenticationEntryPoint(ObjectMapper objectMapper) {
         return (request, response, exception) -> writeError(
                 objectMapper, response, HttpServletResponse.SC_UNAUTHORIZED,
@@ -134,9 +160,14 @@ public class SecurityConfig {
     }
 
     private static AccessDeniedHandler jsonAccessDeniedHandler(ObjectMapper objectMapper) {
-        return (request, response, exception) -> writeError(
-                objectMapper, response, HttpServletResponse.SC_FORBIDDEN,
-                "CSRF_REJECTED", "The request could not be verified.", request.getRequestURI());
+        return (request, response, exception) -> {
+            boolean csrfFailure = exception instanceof CsrfException;
+            writeError(
+                    objectMapper, response, HttpServletResponse.SC_FORBIDDEN,
+                    csrfFailure ? "CSRF_REJECTED" : "FORBIDDEN",
+                    csrfFailure ? "The request could not be verified." : "You do not have permission to access this resource.",
+                    request.getRequestURI());
+        };
     }
 
     private static void writeError(
