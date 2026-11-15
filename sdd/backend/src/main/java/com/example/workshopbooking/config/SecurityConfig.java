@@ -8,10 +8,22 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Bean
+    AuthenticationProvider accountAuthenticationProvider(
+            UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
 
     @Bean
     CookieCsrfTokenRepository csrfTokenRepository() {
@@ -29,7 +41,8 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             CookieCsrfTokenRepository csrfTokenRepository,
-            SpaCsrfTokenRequestHandler csrfTokenRequestHandler)
+            SpaCsrfTokenRequestHandler csrfTokenRequestHandler,
+            AuthenticationProvider accountAuthenticationProvider)
             throws Exception {
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
@@ -46,6 +59,7 @@ public class SecurityConfig {
         // This is a REST API; do not enable Spring Security's default HTML login form or HTTP Basic.
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
+        http.authenticationProvider(accountAuthenticationProvider);
 
         return http.build();
     }
