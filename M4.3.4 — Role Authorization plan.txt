@@ -1,0 +1,26 @@
+Use the springboot-backend-developer Skill.
+
+Implement the approved M4.3.4 Role Authorization plan.
+
+Requirements:
+1. Public workshop GET routes.
+2. Public visitor registration POST route, with CSRF protection.
+3. Admin routes require ADMIN.
+4. Instructor routes require INSTRUCTOR.
+5. /auth/login remains public and CSRF protected.
+6. /auth/me and /auth/logout require authentication.
+7. Unmatched API routes require authentication.
+8. Return 401 UNAUTHENTICATED for unauthenticated requests.
+9. Return 403 FORBIDDEN for insufficient roles.
+10. Return 403 CSRF_REJECTED for CSRF failures.
+
+Keep Instructor ownership checks out of scope; they belong to M4.3.5.
+
+Add tests for the complete role and public-route matrix.
+
+Do not implement workshop business logic.
+Do not implement Instructor ownership.
+Do not implement Admin bootstrap.
+Do not modify database migrations.
+
+Run relevant tests and report the results.

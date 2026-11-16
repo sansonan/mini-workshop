@@ -1,0 +1,77 @@
+Requirement Instructor prepare checklist 
+
+1. create GitHub repository 
+2. Prepare Java 21 and maven 
+3. Install IntelliJ Idea or vs code
+4. Install Node.js and npm 
+5. Install PosgresSql
+6. Verify ChatGPT access (GO plan ) (Gemini + antigravity )
+7. Verify codex access and GitHub connection 
+8. Prepare agent Instruction examples 
+9. Prepare three Agent Skills 
+10. Prepare starter project or empty repository
+11. Test the full implementation workflow
+
+
+Ai-powered software development workflow
+
+Step 1: ChatGPT : Product planning (request prompt from chatgpt then copy prompt to codex ?)
+Ask ChatGPT to act as a Product Manager.
+- Identify the problem.
+- Define users.
+- Define requirements.
+- Identify business rules.
+
+Step 2: 
+    create project documentation ( ask chatgpt prompt for codex help to create docs/..)
+ docs/
+  requirements.md
+  architecture.md
+  database-design.md
+  api-specification.md
+  implementation-plan.md
+
+location : D:\mini-project
+
+step 3: create folder in location D:\mini-project 
+  - backend 
+  - fronted
+  - QA
+  - Reviewer ??
+  - database 
+
+step 4 : create instustion of project (ask chatpgt to create
+instruction 
+  -Create Workshop entity.
+Create WorkshopRepository.
+Create WorkshopService.
+Create WorkshopController.
+Write unit tests.
+
+
+step 5 chat to chatgpt to create skill 
+  spring-boot-backend / skill.md
+  react/skill.md
+  testing/skill.md
+
+--------------------------------------------
+
+step 1 prompt 
+
+Act as a Senior Product Manager. I want to build a Mini Workshop Booking System. Help me define business objectives, user roles, functional requirements, non-functional requirements, and acceptance criteria. Do not generate code. Focus on requirements and ask questions when necessary.
+
+step 2 : AI architect 
+Act as a Senior Software Architect. Analyze my approved requirements and propose system architecture, database design, REST API endpoints, security considerations, and technical implementation plan. Do not implement anything yet.  
+
+
+step 3 : codex implement 
+Read the approved specifications in the docs directory. Implement the Workshop Management module following the existing architecture. Follow project coding conventions, implement validation and error handling, write unit tests, do not modify unrelated modules, and report files changed and tests executed. Do not proceed to the next module until this task is verified.
+
+Step 4 : Ai code review 
+
+Act as a Senior Java Code Reviewer. Review the implemented Workshop Management module. Check Clean Code, SOLID principles, security, performance, unit test coverage, and potential bugs. Report issues with severity and suggested fixes. Do not modify code.
+
+
+
+
+

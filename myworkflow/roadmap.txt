@@ -1,0 +1,56 @@
+Your actual development workflow
+1. ChatGPT — Product Manager
+   
+   Understand the business problem and define requirements.
+   
+   Output: Approved requirements.
+2. ChatGPT — Software Architect
+   
+   Analyze the approved requirements and design the architecture.
+   
+   Output: Architecture, database, and API design.
+3. ChatGPT — SDD Documentation
+   
+   Prepare the complete Markdown specification files.
+   
+   Output: Seven documents inside docs/.
+4. Codex — Repository Setup
+   
+   Read AGENTS.md, inspect the repository, and verify that documentation is consistent.
+   
+   Output: Repository readiness report.
+5. ChatGPT + Codex — Agent Definitions
+   
+   Define the responsibilities and instructions for specialized AI roles.
+   
+   Output: Five agent instruction files.
+6. ChatGPT + Codex — Reusable Skills
+   
+   Create three reusable SKILL.md files.
+   
+   Output: Spring Boot, React, and Testing Skills.
+7. Codex — Implementation Planning
+   
+   Break the implementation plan into small, verifiable development tasks.
+   
+   Output: Task-by-task implementation plan.
+8. Codex — Implementation
+   
+   Implement one feature at a time.
+   
+   Output: Working backend and frontend.
+9. QA Agent — Testing
+   
+   Run automated tests and verify business requirements.
+   
+   Output: Test report.
+10. Reviewer Agent — Code Review
+    
+    Review code quality, security, and architecture.
+    
+    Output: Code review report.
+11. You — Final Approval
+    
+    Verify, understand, and approve the implementation.
+    
+    Output: Completed GitHub project.

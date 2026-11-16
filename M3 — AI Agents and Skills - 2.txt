@@ -1,0 +1,41 @@
+Use the `sdd-document-reviewer` Skill and follow the project instructions in `AGENTS.md`.
+
+## Task: Perform an SDD consistency review
+
+Review these four documents:
+
+1. `sdd/docs/requirements.md`
+2. `sdd/docs/architecture.md`
+3. `sdd/docs/database-design.md`
+4. `sdd/docs/api-specification.md`
+
+Check:
+
+- Requirements versus architecture consistency.
+- Architecture versus database design consistency.
+- Database design versus API specification consistency.
+- Business rules consistency.
+- Authentication and authorization.
+- Workshop capacity and duplicate registration rules.
+- Workshop status and time-zone handling.
+- Confirmation email workflow.
+- API error handling.
+
+## Output
+
+Provide:
+1. Executive summary.
+2. Findings grouped by Critical, High, Medium and Low severity.
+3. File references for each finding.
+4. Recommendations.
+5. Overall consistency assessment.
+
+## Restrictions
+
+- Review only.
+- Do not modify any files.
+- Do not implement code.
+- Do not change approved decisions.
+- Do not commit or push.
+
+Important: Explicitly report whether you used the `sdd-document-reviewer` Skill.

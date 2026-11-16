@@ -1,0 +1,121 @@
+Use the `springboot-backend-developer` Skill and follow the project instructions in `AGENTS.md`.
+
+# M3.4 — Backend Developer Skill Test
+
+## Task
+
+Prepare the first backend implementation plan for the Mini Workshop Booking System.
+
+Read these approved documents:
+
+- `sdd/docs/requirements.md`
+- `sdd/docs/architecture.md`
+- `sdd/docs/database-design.md`
+- `sdd/docs/api-specification.md`
+
+## 1. Maven project structure
+
+Recommend a practical Spring Boot Maven project structure.
+
+## 2. Dependencies
+
+Recommend necessary dependencies, including:
+
+- Spring Web
+- Spring Data JPA
+- Spring Security
+- PostgreSQL Driver
+- Bean Validation
+- Spring Boot Mail
+- JUnit 5
+- Mockito
+
+Explain the purpose of each dependency.
+
+## 3. Java package structure
+
+Propose packages for:
+
+- config
+- common
+- auth
+- workshop
+- registration
+- notification
+
+## 4. Backend responsibilities
+
+Explain the responsibilities of:
+
+- Entities
+- Repositories
+- Services
+- Controllers
+- DTOs
+- Validators
+- Exception handlers
+
+## 5. Security
+
+Explain the planned implementation of:
+
+- Admin authentication.
+- Instructor authentication.
+- Server-side sessions.
+- Role-based authorization.
+- Instructor ownership validation.
+- CSRF protection.
+
+Do not invent the unresolved CSRF token transport configuration.
+
+## 6. Database
+
+Explain how the four approved tables map to JPA entities:
+
+- accounts
+- workshops
+- registrations
+- email_outbox
+
+Respect the approved database constraints and relationships.
+
+## 7. Email outbox
+
+Explain transactional registration and email processing, including retry behavior.
+
+## 8. Testing strategy
+
+Propose unit and integration tests using JUnit 5 and Mockito, including PostgreSQL integration testing.
+
+## 9. Implementation sequence
+
+Recommend a practical sequence, starting with project setup, configuration, Authentication and Workshop modules.
+
+## 10. Unresolved decisions
+
+Identify unresolved items, especially:
+
+- CSRF token transport and header.
+- Email normalization consistency.
+- Any other decisions that block implementation.
+
+## Restrictions
+
+- Planning only.
+- Do not create Java files.
+- Do not modify approved SDD documents.
+- Do not create database migrations.
+- Do not execute SQL.
+- Do not implement APIs.
+- Do not commit or push.
+
+## Final report
+
+Report:
+
+1. Whether `springboot-backend-developer` Skill was used.
+2. Proposed Maven and package structure.
+3. Dependencies.
+4. Implementation sequence.
+5. Unresolved decisions.
+6. Whether backend implementation is ready to begin.

@@ -1,0 +1,21 @@
+We are preparing to run the M4.2 Flyway migration against my PostgreSQL development database.
+
+Database name: workshop_booking_db
+
+Please inspect:
+1. `backend/src/main/resources/application.yml`
+2. `backend/pom.xml`
+3. `backend/src/main/resources/db/migration/V1__create_initial_schema.sql`
+
+Check whether:
+- The datasource URL uses the correct database name.
+- The username and password are read from environment variables (`DB_USERNAME` and `DB_PASSWORD`).
+- Flyway is enabled.
+- Hibernate uses `ddl-auto: validate`.
+- The PostgreSQL driver and Flyway PostgreSQL support dependencies are present.
+
+Do not display passwords or other secrets.
+Do not modify files.
+Do not run the application or migration yet.
+
+Report the configuration and tell me exactly which environment variables I need to set on Windows.

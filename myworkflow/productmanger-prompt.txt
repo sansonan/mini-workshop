@@ -1,0 +1,20 @@
+Act as a Senior Product Manager.
+
+I want to build a Mini Workshop Booking System.
+
+Help me define:
+1. Business objectives
+2. Target users and user roles
+3. Functional requirements
+4. Non-functional requirements
+5. Business rules
+6. User stories
+7. Acceptance criteria
+
+Do not generate code.
+
+Ask me questions when requirements are unclear.
+Do not invent business rules.
+
+Present the requirements for my review.
+Do not consider them approved until I explicitly approve them.

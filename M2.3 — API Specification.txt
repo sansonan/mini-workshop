@@ -1,0 +1,110 @@
+You are a Senior API Architect specializing in REST API design, Java Spring Boot, React, and PostgreSQL.
+
+I am developing the Mini Workshop Booking System using Spec-Driven Development (SDD).
+
+The following documents are approved and must be treated as the source of truth:
+
+1. `sdd/docs/requirements.md`
+2. `sdd/docs/architecture.md`
+3. `sdd/docs/database-design.md`
+
+# Task
+
+Create a new document:
+
+`sdd/docs/api-specification.md`
+
+# Required sections
+
+## 1. API Overview
+- REST API conventions.
+- Base URL: `/api/v1`.
+- JSON request and response formats.
+- HTTP status code conventions.
+
+## 2. Authentication APIs
+- Login.
+- Logout.
+- Current authenticated user.
+- Session and security behavior.
+
+## 3. Public Workshop APIs
+- List available workshops.
+- View workshop details.
+- Pagination and filtering where appropriate.
+
+## 4. Registration APIs
+- Register for a workshop.
+- Required and optional request fields.
+- Successful response examples.
+- Duplicate registration handling.
+- Full workshop handling.
+- Reject registration at or after workshop start time.
+- Validation errors.
+
+## 5. Admin APIs
+- Create workshop.
+- Update workshop.
+- Delete workshop.
+- View all workshops.
+- View participants.
+- Assign an instructor.
+
+## 6. Instructor APIs
+- View assigned workshops only.
+- View participants for assigned workshops only.
+
+## 7. Error Response Contract
+- Standard JSON error structure.
+- HTTP status codes.
+- Error codes.
+- Field validation errors.
+
+## 8. Authorization Rules
+- Visitor.
+- Admin.
+- Instructor.
+- Prevent unauthorized access to other instructors' workshops.
+
+## 9. Request and Response Examples
+- Include realistic JSON examples for important endpoints.
+
+## 10. API Security
+- Follow the approved architecture's session authentication, CSRF, and cookie security decisions.
+
+## 11. API-to-Database Mapping
+- Explain which database tables support each API operation.
+
+# Important business rules
+
+- Follow all approved M1, M2.1, and M2.2 decisions.
+- Workshop status is derived, not stored in the database.
+- Use `Asia/Phnom_Penh` for date/time calculations and display.
+- A registration cannot occur at or after workshop start time.
+- Prevent duplicate registrations.
+- Prevent overbooking.
+- Only assigned instructors can view their workshops and participants.
+- Confirmation email is processed through the email outbox.
+- Do not introduce new product features.
+
+# Restrictions
+
+- Create only `sdd/docs/api-specification.md`.
+- Do not modify existing approved documents.
+- Do not create Java code, React code, SQL migrations, or tests.
+- Do not implement any APIs.
+- If a decision is unclear, report it instead of inventing a new requirement.
+- Do not commit or push Git changes.
+
+# Final report
+
+After creating the document, report:
+
+1. API modules and endpoints.
+2. Important request and response examples.
+3. Authentication and authorization approach.
+4. Error response design.
+5. Consistency with M1, M2.1, and M2.2.
+6. Any decisions requiring my approval.
+
+Do not commit or push changes.

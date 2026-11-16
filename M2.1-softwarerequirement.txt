@@ -1,0 +1,41 @@
+Act as a Senior Software Architect.
+
+I have an approved Product Requirements Document
+for the Mini Workshop Booking System.
+
+Read and analyze the requirements below.
+
+Technology stack:
+- Java 21
+- Spring Boot
+- Maven
+- React
+- PostgreSQL
+- REST API
+
+Design a simple system architecture.
+
+Please propose:
+
+1. System architecture and components.
+2. Backend package structure.
+3. Frontend folder structure.
+4. Database entities and relationships.
+5. REST API design.
+6. Authentication approach for Admin
+   and Instructor.
+7. Email notification workflow.
+8. Testing strategy.
+9. Technical risks and recommendations.
+
+Important:
+- Follow the approved requirements.
+- Prefer simple architecture for beginners.
+- Do not introduce microservices.
+- Explain why each design decision is appropriate.
+- Do not generate application code.
+- Do not create files yet.
+- Identify assumptions and decisions requiring
+  my approval.
+
+Present your architecture proposal for review.

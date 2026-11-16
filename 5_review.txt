@@ -1,0 +1,39 @@
+Update the existing file:
+
+sdd/docs/architecture.md
+
+Apply the following approved decisions:
+
+1. Workshop status becomes COMPLETED when
+   current time reaches or passes workshop end time.
+
+2. Workshop status becomes FULL when the workshop
+   has not ended and registration count reaches
+   maximum capacity.
+
+3. Otherwise, workshop status is OPEN.
+
+4. Registration must be rejected once workshop
+   start time is reached, independently of its
+   displayed status.
+
+5. Set the training center time zone to
+   Asia/Phnom_Penh (UTC+7).
+
+6. Store workshop times as unambiguous instants
+   and display them using Asia/Phnom_Penh.
+
+7. Use the configured training center time zone
+   for backend status and registration calculations.
+
+Important:
+- Preserve all other approved architecture decisions.
+- Do not change unrelated sections.
+- Do not create database-design.md.
+- Do not create api-specification.md.
+- Do not generate application code.
+- Do not change the approved M1 requirements.
+- Report all modified sections.
+
+After editing, verify consistency with
+sdd/docs/requirements.md.

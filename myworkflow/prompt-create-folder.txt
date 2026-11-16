@@ -1,0 +1,103 @@
+# Task: Create SDD Project Folder Structure
+
+I want you to create a professional project folder structure for a Spec-Driven Development (SDD) project, following the directory organization shown below.
+
+## 1. Required Folder Structure
+
+Create this structure at the root of the repository:
+
+```text
+sdd/
+├── docs/
+│   └── README.md
+│
+├── agents/
+│   └── README.md
+│
+├── .agents/
+│   └── skills/
+│       └── README.md
+│
+├── backend/
+│   └── README.md
+│
+├── frontend/
+│   └── README.md
+│
+├── database/
+│   └── README.md
+│
+├── qa/
+│   └── README.md
+│
+├── AGENTS.md
+└── README.md
+```
+
+## 2. Folder Responsibilities
+
+Create the following folders with clear responsibilities:
+
+- **docs/**: SDD documentation, project specifications, requirements, architecture, implementation plans, and technical decisions.
+- **agents/**: AI agent role definitions, responsibilities, workflows, and instructions.
+- **.agents/skills/**: Reusable AI agent skills and task-specific workflows.
+- **backend/**: Java 21 and Spring Boot application.
+- **frontend/**: React application.
+- **database/**: PostgreSQL database scripts, schema, migrations, and SQL documentation.
+- **qa/**: Test plans, test cases, test reports, and quality assurance documentation.
+
+## 3. Root Documentation
+
+Create two important Markdown files:
+
+### AGENTS.md
+This file contains project-wide instructions for Codex and other AI agents.
+
+Include:
+- Project overview
+- Technology stack
+- SDD development principles
+- Coding standards
+- Architecture guidelines
+- Testing requirements
+- Database guidelines
+- Git and commit conventions
+- Rules for AI agents
+- Instructions to read relevant specifications before implementation
+
+### README.md
+This file contains:
+- Project introduction
+- Project objectives
+- Technology stack
+- Project folder structure
+- Development environment prerequisites
+- Setup instructions
+- How to run the backend
+- How to run the frontend
+- Database configuration
+- SDD development workflow
+
+## 4. Important Rules
+
+1. First, inspect the existing repository structure.
+2. Do not delete, overwrite, or modify existing project files unnecessarily.
+3. Create only missing folders and files.
+4. Keep documentation clear, professional, and beginner-friendly.
+5. Use Markdown for documentation.
+6. Do not implement application functionality yet.
+7. Do not generate unnecessary source code.
+8. Make sure the structure is Git-friendly.
+9. Ensure that AGENTS.md provides clear instructions for future Codex sessions.
+
+## 5. Execution
+
+After creating the structure:
+
+1. Show me the final directory tree.
+2. Explain the responsibility of each folder.
+3. List all files created.
+4. Identify any existing files that were preserved.
+5. Verify that the structure is correct.
+
+**Important:** This task is only for preparing the SDD project foundation. Do not start application development or implementation yet.

@@ -1,0 +1,22 @@
+I have approved the Product Requirements Document
+for the Mini Workshop Booking System, version 1.0.
+
+Please create:
+
+docs/requirements.md
+
+Use the complete approved PRD content provided
+in this task/conversation.
+
+Instructions:
+1. Check the current repository structure.
+2. Create the docs directory if it does not exist.
+3. Create requirements.md with the approved content.
+4. Preserve all requirements, business rules,
+   user stories, acceptance criteria, and scope.
+5. Do not create other documentation files.
+6. Do not generate application code.
+7. Do not modify unrelated files.
+8. Report the created file and its Git status.
+
+This is a documentation-only task.

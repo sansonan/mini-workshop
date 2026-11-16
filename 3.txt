@@ -1,0 +1,1 @@
+I’ll treat your approval as accepting the proposal and its listed defaults, and record it as sdd/docs/architecture.md so the approved design is available for the next SDD stage.

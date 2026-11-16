@@ -1,0 +1,2 @@
+git add sdd/docs/architecture.md
+git commit -m "docs: add approved system architecture"

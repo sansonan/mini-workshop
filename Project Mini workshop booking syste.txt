@@ -1,0 +1,21 @@
+Project: Mini workshop booking system
+
+Requirement : 
+user: admin: create/edit/and delete workshops , visitor: browser workshops and register , Instructor: view assigned workshops and participants
+
+Only five features:
+1. Create and manage workshops.
+2. Display available workshops.
+3. Register for a workshop.
+4. View registered participants.
+5. Send booking confirmation email
+
+Technology stack
+backed : java 21 spring boot / mvn
+fronted : React 
+posgresSql
+api : rest api
+testing : unitest
+
+
+

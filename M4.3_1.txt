@@ -1,0 +1,34 @@
+Use the springboot-backend-developer Skill.
+
+Implement the approved M4.3.2 Account Authentication plan.
+
+Scope:
+1. Create Account JPA entity mapped to the existing accounts table.
+2. Create AccountRepository.
+3. Create AccountPrincipal implementing UserDetails.
+4. Create AccountUserDetailsService.
+5. Configure BCryptPasswordEncoder with strength 12.
+6. Configure DaoAuthenticationProvider and connect it to SecurityConfig.
+
+Requirements:
+- Normalize email using trim() and toLowerCase(Locale.ROOT).
+- Reject inactive accounts.
+- Never store plaintext passwords.
+- Follow the existing PostgreSQL schema.
+- Do not add database migrations.
+- Do not implement login/logout endpoints, role-based route authorization, or Admin bootstrap.
+- Do not change unrelated files.
+
+Tests:
+- Email normalization.
+- Account not found.
+- Inactive account rejected.
+- BCrypt password matching and rejection.
+- PostgreSQL entity/repository integration test using Testcontainers where available.
+
+Run the relevant tests and report:
+- Files created or modified.
+- Tests passed, failed, or skipped.
+- Any unresolved issues.
+
+Do not expand the scope.

@@ -1,0 +1,36 @@
+Use the springboot-backend-developer Skill.
+
+Implement the approved M4.3.5 — Instructor Ownership plan.
+
+Read the approved SDD documents and inspect the existing backend before coding.
+
+Implement only:
+
+1. Workshop and Registration JPA entities mapped to the existing PostgreSQL schema.
+2. WorkshopRepository with Instructor-scoped queries.
+3. RegistrationRepository for workshop participants.
+4. InstructorWorkshopService.
+5. InstructorWorkshopController.
+
+Requirements:
+- Get Instructor account ID from the authenticated AccountPrincipal.
+- Never trust an Instructor ID supplied by the client.
+- Instructors can list only their assigned workshops.
+- Check workshop existence and ownership before retrieving participants.
+- Return 404 RESOURCE_NOT_FOUND for nonexistent workshops.
+- Return 403 FORBIDDEN for workshops assigned to another Instructor.
+- Admin access remains unrestricted.
+- Reuse approved API response structures.
+- Do not add database migrations or change the schema.
+- Do not implement unrelated workshop business logic.
+
+Tests:
+- Instructor sees only assigned workshops.
+- Instructor cannot access another Instructor's participants.
+- Nonexistent workshop returns 404.
+- Unauthorized ownership returns 403.
+- Participant repository is not queried when ownership fails.
+- Admin authorization remains unaffected.
+- Run relevant tests and report skipped tests clearly.
+
+Do not expand the scope.

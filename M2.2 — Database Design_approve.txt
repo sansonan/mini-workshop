@@ -1,0 +1,88 @@
+You are a Senior Database Designer specializing in PostgreSQL and Spring Boot applications.
+
+I am working on the Mini Workshop Booking System.
+
+Please create the database design document based strictly on these approved documents:
+
+- `sdd/docs/requirements.md`
+- `sdd/docs/architecture.md`
+
+### Task
+
+Create:
+
+`sdd/docs/database-design.md`
+
+### Include these sections:
+
+1. Database Overview
+   - PostgreSQL
+   - Database naming conventions
+   - Primary key strategy
+
+2. Entity Relationship Diagram (ERD)
+   - Account
+   - Workshop
+   - Registration
+   - Email Outbox
+   - Show relationships and cardinality.
+
+3. Table Definitions
+
+   For each table, specify:
+   - Column name
+   - PostgreSQL data type
+   - Primary key
+   - Foreign key
+   - Nullable or NOT NULL
+   - Default values
+   - Description
+
+4. Constraints
+   - Unique constraints
+   - Foreign key constraints
+   - Check constraints
+   - Prevent duplicate registrations.
+   - Prevent workshop deletion when registrations exist.
+   - Prevent reducing workshop capacity below existing registrations.
+
+5. Index Design
+   - Identify useful indexes for common queries.
+   - Explain why each index is needed.
+
+6. Workshop Status and Time Handling
+   - Store start and end times as unambiguous instants.
+   - Use `Asia/Phnom_Penh` for calculations and display.
+   - COMPLETED when current time reaches or passes workshop end time.
+   - FULL when capacity is reached and workshop has not ended.
+   - OPEN otherwise.
+   - Registration must be rejected at or after workshop start time.
+
+7. Concurrent Registration
+   - Explain how PostgreSQL transactions and row-level locking prevent overbooking.
+   - Explain how unique constraints prevent duplicate registrations.
+
+8. Sample SQL
+   - CREATE TABLE statements.
+   - Constraints and indexes.
+   - Provide illustrative SQL only; do not execute it.
+
+9. Data Integrity and Security Considerations
+
+### Important rules
+
+- Follow the approved PRD and architecture.
+- Do not introduce new features or unnecessary tables.
+- Do not create application code, entities, repositories, or Flyway migrations.
+- Do not modify `requirements.md` or `architecture.md`.
+- If a design decision is unclear or conflicts with an approved document, identify it rather than silently making a decision.
+- Keep the design suitable for a beginner learning Spec-Driven Development.
+
+After creating the document, report:
+1. What files were created.
+2. The proposed database tables.
+3. Important constraints and indexes.
+4. Any decisions requiring my approval.
+5. Whether the design is consistent with M1 and M2.1.
+
+Do not commit or push changes.

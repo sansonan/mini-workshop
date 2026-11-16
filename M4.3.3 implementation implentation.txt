@@ -1,0 +1,39 @@
+Use the springboot-backend-developer Skill.
+
+Implement the approved M4.3.3 Login, Logout and Session plan.
+
+Read the existing SDD documents and inspect M4.3.1 and M4.3.2 implementations first.
+
+Implement only:
+
+1. POST /api/v1/auth/login
+2. GET /api/v1/auth/me
+3. POST /api/v1/auth/logout
+4. 30-minute server-side session timeout.
+5. Approved session cookie settings.
+6. Standard JSON authentication errors.
+
+Important requirements:
+- Authenticate using the existing DaoAuthenticationProvider.
+- Explicitly save SecurityContext into the HTTP session after successful login.
+- Preserve session fixation protection.
+- Keep CSRF enabled for login and logout.
+- Use XSRF-TOKEN cookie and X-XSRF-TOKEN header.
+- Generate a fresh CSRF cookie after successful login and logout.
+- Do not expose session IDs or password hashes.
+- Return the approved account response fields only.
+- Use the existing API contract.
+- Do not implement role-based route authorization or Admin bootstrap.
+
+Tests:
+- Successful and unsuccessful login.
+- Authenticated and unauthenticated /me.
+- Logout and session invalidation.
+- CSRF rejection and acceptance.
+- CSRF token refresh after login and logout.
+- Session fixation protection.
+- Cookie attributes and 30-minute timeout.
+
+Run relevant tests and report all passed, failed, and skipped tests.
+
+Do not expand the scope.
